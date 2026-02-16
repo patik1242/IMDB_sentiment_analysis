@@ -61,9 +61,9 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, model_name
 def train_model(X_train, X_test, y_train, y_test):
     results = {}
     clf = {
-        "Logistic Regression": LogisticRegression(random_state=42, solver="saga", penalty="l2", class_weight="balanced", C=2.0), 
+        "Logistic Regression": LogisticRegression(random_state=42, solver="saga", class_weight="balanced", C=2.0), 
         "LinearSVC": LinearSVC(C=1, dual=True, loss="squared_hinge", random_state=42, class_weight="balanced", max_iter=20000), 
-        "Ridge Classifier": RidgeClassifier(alpha=1.0, solver="saga", class_weight= "balanced", random_state=42)
+        "Ridge Classifier": RidgeClassifier(alpha=1.0, solver="lsqr", class_weight= "balanced", random_state=42)
         }
     
     for model_name, classifier in clf.items():

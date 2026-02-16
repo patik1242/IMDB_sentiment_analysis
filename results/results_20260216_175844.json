@@ -1,0 +1,105 @@
+{
+  "timestamp": "20260216_175844",
+  "model": {
+    "name": "LinearSVC",
+    "f1_score": 0.9133598496921487
+  },
+  "all_models": {
+    "Logistic Regression": {
+      "params": {
+        "C": 2.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 100,
+        "n_jobs": null,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "saga",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "train_metrics": {
+        "accuracy": 0.968460064542154,
+        "precision": 0.9685037405143857,
+        "recall": 0.9684444793149525,
+        "f1": 0.9684581502373077
+      },
+      "test_metrics": {
+        "accuracy": 0.9082291246470351,
+        "precision": 0.9084244447226817,
+        "recall": 0.9081905697957483,
+        "f1": 0.9082113470059796
+      },
+      "roc_auc": 0.969499996745512
+    },
+    "LinearSVC": {
+      "params": {
+        "C": 1,
+        "class_weight": "balanced",
+        "dual": true,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "loss": "squared_hinge",
+        "max_iter": 20000,
+        "multi_class": "ovr",
+        "penalty": "l2",
+        "random_state": 42,
+        "tol": 0.0001,
+        "verbose": 0
+      },
+      "train_metrics": {
+        "accuracy": 0.9985125050423558,
+        "precision": 0.9985117453636672,
+        "recall": 0.9985133310077966,
+        "f1": 0.998512486774086
+      },
+      "test_metrics": {
+        "accuracy": 0.913372327551432,
+        "precision": 0.9135069470346677,
+        "recall": 0.9133407969590064,
+        "f1": 0.9133598496921487
+      },
+      "roc_auc": null
+    },
+    "Ridge Classifier": {
+      "params": {
+        "alpha": 1.0,
+        "class_weight": "balanced",
+        "copy_X": true,
+        "fit_intercept": true,
+        "max_iter": null,
+        "positive": false,
+        "random_state": 42,
+        "solver": "lsqr",
+        "tol": 0.0001
+      },
+      "train_metrics": {
+        "accuracy": 0.9940500201694231,
+        "precision": 0.9940512202532155,
+        "recall": 0.9940488084258186,
+        "f1": 0.9940499233484358
+      },
+      "test_metrics": {
+        "accuracy": 0.9119604679306171,
+        "precision": 0.9121400951029282,
+        "recall": 0.9119237929104235,
+        "f1": 0.911944626802449
+      },
+      "roc_auc": null
+    }
+  },
+  "mcnemar": {
+    "model_a": "LinearSVC",
+    "model_b": "Ridge Classifier",
+    "b": 102,
+    "c": 116,
+    "n": 218,
+    "method": "chi2",
+    "chi2": 0.7752293577981652,
+    "p_value": 0.37860415446400786
+  }
+}

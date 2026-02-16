@@ -31,7 +31,7 @@ def false_sentences(text, y_pred, y_test, name = "model"):
     values = [tp, tn, fp, fn]
 
     plt.figure(figsize=(6,6))
-    plt.pie(values, labels, autopct='%1.1f%%')
+    plt.pie(values, labels=labels, autopct='%1.1f%%')
     plt.title("Type of errors in sentiment analysis")
     plt.savefig(analysis_dir/f"{name}-error_pie.png")
     plt.close()
