@@ -4,7 +4,7 @@ from preprocessing import preprocess_vector
 app = flask.Flask(__name__, template_folder='templates')
 vectorizer = None 
 
-with open("models/best_model.pkl", "rb") as f:
+with open("models/model.pkl", "rb") as f:
     model = pickle.load(f)
 
 with open("models/vectorizer.pkl", "rb") as f:
@@ -22,7 +22,7 @@ def index():
 
         pred = model.predict(X_vec)
 
-        sentiment = "Positive" if pred==1 else "Negative"
+        sentiment = "Positive" if pred[0]==1 else "Negative"
 
     return flask.render_template("index.html", sentiment=sentiment)
 

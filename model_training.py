@@ -6,11 +6,18 @@ from save_to_json import save_model, save_results_to_json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
-def training_model(data):
-    text = data["review"].copy()
-    y = data["sentiment"]
+from pathlib import Path
+import matplotlib.pyplot as plt
+import pandas as pd
 
-    vectorizer = TfidfVectorizer(ngram_range = (1,2))
+def training_model(clean_training):
+    charts_dir = Path("charts")
+    charts_dir.mkdir(exist_ok=True)
+
+    text = clean_training["review"].copy()
+    y = clean_training["sentiment"]
+
+    vectorizer = TfidfVectorizer(ngram_range = (1,2), max_df=0.9, max_features=120000, min_df=2)
 
     X_train, X_test, y_train, y_test = train_test_split(text, y, test_size=0.2, random_state=42, stratify=y) 
     
@@ -22,10 +29,43 @@ def training_model(data):
 
     results = train_model(X_train_tfidf, X_test_tfidf, y_train, y_test)
 
+    best_f1_score = 0
+    best_estimator = None
+    best_model_name = None
+
+    for name, model_dict in results.items():
+        f1 = model_dict["test"]["f1"]
+        if f1 > best_f1_score:
+            best_f1_score = f1
+            best_estimator = model_dict["estimator"]
+            best_model_name = name
+                
     model_info = {
-        "name": "Logistic Regression", 
-        "f1": results["test"]["f1"]
+        "name": best_model_name, 
+        "f1": best_f1_score
     }
 
     save_results_to_json(results, model_info)
-    save_model(results["estimator"], vectorizer)
+    save_model(best_estimator, vectorizer)
+
+    plt.figure(figsize=(12,6))
+    metrics = ["accuracy", "precision", "recall", "f1"]
+
+    df_plot = pd.DataFrame({
+        "Model":[m for m, d in results.items()],
+        "Accuracy":[d["test"]["accuracy"] for m, d in results.items()],
+        "Precision":[d["test"]["precision"] for m, d in results.items()],
+        "Recall":[d["test"]["recall"] for m, d in results.items()],
+        "F1":[d["test"]["f1"] for m, d in results.items()],
+    })
+
+    df_plot.set_index('Model').plot(kind="bar", figsize=(12,6))
+    plt.title("Test metrics")
+    plt.ylabel("Metrics")
+    plt.ylim(0,1)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(charts_dir/"Comparing_metrics.png")
+    plt.close()
+
+    

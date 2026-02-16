@@ -11,7 +11,7 @@ def save_results_to_json(results, model_info):
     results_summary = {
         "timestamp": timestamp,
         "model": {
-            "name": "Logistic Regression", 
+            "name": model_info["name"], 
             "f1_score": model_info["f1"]
         }, 
         "train_metrics": results["train"], 

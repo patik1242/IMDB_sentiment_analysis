@@ -41,5 +41,5 @@ def preprocess_vector(text):
     words = text.split()
     words_l = [wnl.lemmatize(w) for w in words]
 
-    return "".join(words_l)
+    return " ".join(words_l)
     
