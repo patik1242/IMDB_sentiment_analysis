@@ -2,6 +2,7 @@
 from preprocessing import preprocess_vector
 from training_and_calculating_metrics import train_model
 from save_to_json import save_model, save_results_to_json
+from analysis import false_sentences, mcnemar_results
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
@@ -45,11 +46,18 @@ def training_model(clean_training):
         "f1": best_f1_score
     }
 
-    save_results_to_json(results, model_info)
+    results_sorted = sorted(results.items(), key=lambda x: x[1]["test"]["f1"], reverse=True)
+    best_name, best_dict = results_sorted[0]
+    second_name, second_dict = results_sorted[1]
+    
+    y_pred_best = best_dict["estimator"].predict(X_test_tfidf)
+    y_pred_second = second_dict["estimator"].predict(X_test_tfidf)
+    
+    mc_results = mcnemar_results(y_pred_best, y_pred_second, y_test)
+    save_results_to_json(results, model_info, second_name, mc_results)
     save_model(best_estimator, vectorizer)
 
     plt.figure(figsize=(12,6))
-    metrics = ["accuracy", "precision", "recall", "f1"]
 
     df_plot = pd.DataFrame({
         "Model":[m for m, d in results.items()],

@@ -2,6 +2,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import binom, chi2
 
 def false_sentences(text, y_pred, y_test, name = "model"):
     analysis_dir = Path("analysis")
@@ -32,3 +33,28 @@ def false_sentences(text, y_pred, y_test, name = "model"):
     plt.title("Type of errors in sentiment analysis")
     plt.savefig(analysis_dir/f"{name}-error_pie.png")
     plt.close()
+
+def mcnemar_results(y_pred_a, y_pred_b, y_test):
+    analysis_dir = Path("analysis")
+    analysis_dir.mkdir(exist_ok=True)
+
+    correct_a = (y_pred_a==y_test)
+    correct_b = (y_pred_b==y_test)
+
+    b = int(np.sum((~correct_a) & correct_b))
+    c = int(np.sum(correct_a & (~correct_b)))
+    n = b+c
+
+    if n==0:
+        return {"b": b, "c": c, "n": n, "method": "none", "p_value": 1.0}
+    
+    n_min = min(b,c)
+    if n<25:
+        pvalue = 2*binom.cdf(n_min, n, 0.5) 
+        pvalue = min(1.0, pvalue)
+        return {"b": b, "c": c, "n": n,"method": "exact","p_value": float(min(1.0, pvalue))}
+
+    chi2_statistic = (abs(b-c)-1)**2/n
+    pvalue = chi2.sf(chi2_statistic,1)
+    return {"b": b, "c": c, "n": n, "method": "chi2", "chi2": float(chi2_statistic), "p_value": float(pvalue)}
+

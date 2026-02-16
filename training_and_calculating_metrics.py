@@ -1,3 +1,5 @@
+from analysis import false_sentences
+
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.svm import LinearSVC
@@ -53,6 +55,7 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, model_name
     train_metrics = calculate_metrics(y_train, y_train_pred, model_name, "train")
     test_metrics = calculate_metrics(y_test, y_test_pred, model_name, "test")
 
+    false_sentences(X_test, y_test_pred, y_test, name = f"{model_name}")
     return train_metrics, test_metrics, roc_auc
 
 def train_model(X_train, X_test, y_train, y_test):

@@ -2,7 +2,7 @@ import json, pickle
 from pathlib import Path
 from datetime import datetime
 
-def save_results_to_json(results, model_info):
+def save_results_to_json(results, model_info, second_best_model, mcnemar_results):
     results_dir = Path("results")
     results_dir.mkdir(exist_ok=True)
 
@@ -14,11 +14,23 @@ def save_results_to_json(results, model_info):
             "name": model_info["name"], 
             "f1_score": model_info["f1"]
         }, 
-        "train_metrics": results["train"], 
-        "test_metrics": results["test"], 
-        "params": results["params"]
+        "all_models": {}
     }
 
+    for name, model_dict in results.items():
+        results_summary["all_models"][name] = {
+            "params" : model_dict["params"], 
+            "train_metrics": model_dict["train"], 
+            "test_metrics": model_dict["test"], 
+            "roc_auc": model_dict["roc_auc"]
+        }
+
+    results_summary["mcnemar"] = {
+        "model_a": model_info["name"],
+        "model_b": second_best_model,
+        **mcnemar_results
+    }
+ 
     output_path = results_dir/f"results_{timestamp}.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results_summary, f, indent=2, ensure_ascii=False)
