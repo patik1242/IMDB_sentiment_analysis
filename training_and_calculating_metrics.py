@@ -1,4 +1,4 @@
-from analysis import false_sentences
+from analysis import false_sentences, plot_learning_curve
 
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
@@ -70,6 +70,7 @@ def train_model(X_train, X_test, y_train, y_test):
         classifier.fit(X_train, y_train)
         train_metrics, test_metrics, roc_auc = train_and_evaluate_model(
             classifier, X_train, X_test, y_train, y_test, model_name)
+        plot_learning_curve(classifier, X_train, y_train, model_name)
         results[model_name] = {"params": classifier.get_params(), 
                                "estimator": classifier, 
                                "train": train_metrics, 
