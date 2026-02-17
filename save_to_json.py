@@ -25,11 +25,12 @@ def save_results_to_json(results, model_info, second_best_model, mcnemar_results
             "roc_auc": model_dict["roc_auc"]
         }
 
-    results_summary["mcnemar"] = {
-        "model_a": model_info["name"],
-        "model_b": second_best_model,
-        **mcnemar_results
-    }
+    if mcnemar_results is not None:
+        results_summary["mcnemar"] = {
+            "model_a": model_info["name"],
+            "model_b": second_best_model,
+            **mcnemar_results
+        }
  
     output_path = results_dir/f"results_{timestamp}.json"
     with open(output_path, "w", encoding="utf-8") as f:

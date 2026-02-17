@@ -30,33 +30,52 @@ def training_model(clean_training):
 
     results = train_model(X_train_tfidf, X_test_tfidf, y_train, y_test)
 
-    best_f1_score = 0
     best_estimator = None
-    best_model_name = None
 
+    ALPHA = 0.5
+    MAX_GAP = 0.07
+
+    scored = []
     for name, model_dict in results.items():
-        f1 = model_dict["test"]["f1"]
-        if f1 > best_f1_score:
-            best_f1_score = f1
-            best_estimator = model_dict["estimator"]
-            best_model_name = name
-                
-    model_info = {
-        "name": best_model_name, 
-        "f1": best_f1_score
-    }
+        train_f1 = model_dict["train"]["f1"]
+        test_f1 = model_dict["test"]["f1"]
+        gap = train_f1 - test_f1
+        
+        score = test_f1 - ALPHA*gap
+        if gap <= MAX_GAP:
+            scored.append((name, score, gap, test_f1))
 
-    results_sorted = sorted(results.items(), key=lambda x: x[1]["test"]["f1"], reverse=True)
-    best_name, best_dict = results_sorted[0]
-    second_name, second_dict = results_sorted[1]
+    if not scored:
+        for name, model_dict in results.items():
+            train_f1 = model_dict["train"]["f1"]
+            test_f1 = model_dict["test"]["f1"]
+            gap = train_f1 - test_f1
+            score = test_f1 - ALPHA*gap
+            scored.append((name, score, gap, test_f1))
+
+    scored_sorted = sorted(scored, key=lambda x: x[1], reverse=True)
+    best_name, best_scored, best_gap, best_f1 = scored_sorted[0]
+    second_name = scored_sorted[1][0] if len(scored_sorted) > 1 else None
+
+    best_estimator = results[best_name]["estimator"]
+
+    model_info = {
+        "name": best_name, 
+        "f1": best_f1, 
+        "score": best_scored,
+        "gap": best_gap, 
+        "ALPHA": ALPHA
+    }
     
-    y_pred_best = best_dict["estimator"].predict(X_test_tfidf)
-    y_pred_second = second_dict["estimator"].predict(X_test_tfidf)
+    if second_name is not None:
+        y_pred_best = results[best_name]["estimator"].predict(X_test_tfidf)
+        y_pred_second = results[second_name]["estimator"].predict(X_test_tfidf)
+        mc_results = mcnemar_results(y_pred_best, y_pred_second, y_test)
+    else:
+        mc_results = None
     
-    mc_results = mcnemar_results(y_pred_best, y_pred_second, y_test)
     save_results_to_json(results, model_info, second_name, mc_results)
     save_model(best_estimator, vectorizer)
-
 
     plt.figure(figsize=(12,6))
 
