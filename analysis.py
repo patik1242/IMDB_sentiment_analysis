@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from scipy.stats import binom, chi2
 from sklearn.model_selection import learning_curve
+from sklearn.metrics import roc_curve, auc
 
 def false_sentences(text, y_pred, y_test, name = "model"):
     analysis_dir = Path("analysis")
@@ -81,3 +82,27 @@ def plot_learning_curve(model,X,y, model_name):
     plt.grid()
     plt.savefig(charts_dir/f"Learning_curve_{model_name}.png")
     plt.close()
+
+def plot_roc_curve(model, X_test, y_test, model_name):
+    charts_dir = Path("charts")/"roc_curve"
+    charts_dir.mkdir(parents=True, exist_ok=True)
+
+    if not hasattr(model, "predict_proba"):
+        return None
+
+    y_proba = model.predict_proba(X_test)[:,1]
+
+    fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure(figsize=(6,6))
+    plt.plot(fpr, tpr, label = f"{model_name} (AUC = {roc_auc:.3f})")
+    plt.plot([0,1],[0,1], linestyle = "--")
+    plt.xlabel("False positive Rate") #ile ze wszystkich negatywnych oznaczył jako pozytywne
+    plt.ylabel("True Positive Rate") #ile ze wszystkich pozytywnych oznaczał jako pozytywne
+    plt.title(f"ROC Curve - {model_name}")
+    plt.legend()
+    plt.grid()
+    plt.savefig(charts_dir/f"ROC_{model_name}.png")
+    plt.close()
+

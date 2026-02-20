@@ -1,4 +1,4 @@
-from analysis import false_sentences, plot_learning_curve
+from analysis import false_sentences, plot_learning_curve, plot_roc_curve
 
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
@@ -42,23 +42,24 @@ def calculate_metrics(y_true, y_pred, model_name, split):
         'f1': f1
     }
 
-def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, model_name):
+def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, text, model_name):
     
     y_train_pred = model.predict(X_train)
     y_test_pred = model.predict(X_test)
     if hasattr(model, "predict_proba"):
         y_test_proba = model.predict_proba(X_test)[:,1]
         roc_auc = roc_auc_score(y_test, y_test_proba)
+        plot_roc_curve(model, X_test, y_test, model_name)
     else:
         roc_auc=None
 
     train_metrics = calculate_metrics(y_train, y_train_pred, model_name, "train")
     test_metrics = calculate_metrics(y_test, y_test_pred, model_name, "test")
 
-    false_sentences(X_test, y_test_pred, y_test, name = f"{model_name}")
+    false_sentences(text, y_test_pred, y_test, name = f"{model_name}")
     return train_metrics, test_metrics, roc_auc
 
-def train_model(X_train, X_test, y_train, y_test):
+def train_model(X_train, X_test, y_train, y_test, text):
     results = {}
     clf = {
         "Logistic Regression": LogisticRegression(random_state=42, solver="saga", class_weight="balanced", C=1.0, max_iter=3000), 
@@ -69,7 +70,7 @@ def train_model(X_train, X_test, y_train, y_test):
     for model_name, classifier in clf.items():
         classifier.fit(X_train, y_train)
         train_metrics, test_metrics, roc_auc = train_and_evaluate_model(
-            classifier, X_train, X_test, y_train, y_test, model_name)
+            classifier, X_train, X_test, y_train, y_test, text, model_name)
         plot_learning_curve(classifier, X_train, y_train, model_name)
         results[model_name] = {"params": classifier.get_params(), 
                                "estimator": classifier, 
