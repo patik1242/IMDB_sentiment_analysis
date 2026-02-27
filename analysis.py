@@ -9,6 +9,10 @@ from sklearn.model_selection import learning_curve
 from sklearn.metrics import roc_curve, auc
 
 def false_sentences(text, y_pred, y_test, name = "model"):
+    """
+    Zapisuje błędnie sklasyfikowane przykłady.
+    Wykrywa przypadki fałszywie pozytywne i negatywne, oblicza ich liczbę.
+    """
     analysis_dir = Path("analysis")
     analysis_dir.mkdir(exist_ok=True)
 
@@ -39,6 +43,17 @@ def false_sentences(text, y_pred, y_test, name = "model"):
     plt.close()
 
 def mcnemar_results(y_pred_a, y_pred_b, y_test):
+    """
+    Za pomocą testu McNemara porównuje dwa modele klasyfikacji.
+    Analizuje przypadki, w których modele się różnią. 
+    n01 - Model A błędny, Model B poprawny
+    n10 - Model A poprawny, Model B błędny
+    n11 - Model A poprawny, Model B poprawny
+    n00 - Model A błędny, Model B błędny 
+
+    Dla małych wartości n<25 wykonywany jest test dokładny, a 
+    dla większych stosowany jest przybliżenie chi-kwadrat. 
+    """
     analysis_dir = Path("analysis")
     analysis_dir.mkdir(exist_ok=True)
 
@@ -85,6 +100,11 @@ def mcnemar_results(y_pred_a, y_pred_b, y_test):
     return {"n01": n01, "n10": n10, "n": n, "n11": n11, "n00": n00, "method": "chi2", "chi2": float(chi2_statistic), "p_value": float(pvalue)}
 
 def plot_learning_curve(model,X,y, model_name):
+    """
+    Zapisuje krzywą uczenia dla danego modelu. 
+    Learning curve pokazuje przebieg nauki dla każdego modelu na 
+    zbiorze testowym i treningowym. 
+    """
     charts_dir = Path("charts") / "learning_curves"
     charts_dir.mkdir(parents=True, exist_ok=True)
 
@@ -106,16 +126,19 @@ def plot_learning_curve(model,X,y, model_name):
     plt.savefig(charts_dir/f"Learning_curve_{model_name}.png")
     plt.close()
 
-def plot_roc_curve(model, X_test, y_test, model_name):
+def plot_roc_curve(y_true, y_score, model_name):
+    """
+    Rysuje i zapisuje krzywą ROC i wylicza ROC AUC dla podanych wyników. 
+    Krzywa ROC pokazuje zależność pomiędzy True Positive Rate (jaki % pozytywnych przykładów model poprawnie wykrywa), 
+    a False Positive Rate (jaki % negatywnych przykładów model oznacza jako pozytywne).
+    
+    Dla różnych progów sprawdzam jak się zmienia liczba wykrytych pozytywnych i liczba fałszywych alarmów. 
+    ROC AUC mówi jak model dobrze rozdziela klasy niezależnie od progu
+    """
     charts_dir = Path("charts")/"roc_curve"
     charts_dir.mkdir(parents=True, exist_ok=True)
 
-    if not hasattr(model, "predict_proba"):
-        return None
-
-    y_proba = model.predict_proba(X_test)[:,1]
-
-    fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+    fpr, tpr, thresholds = roc_curve(y_true, y_score)
     roc_auc = auc(fpr, tpr)
 
     plt.figure(figsize=(6,6))

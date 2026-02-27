@@ -8,6 +8,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 def calculate_metrics(y_true, y_pred, model_name, split):
+    """
+    Liczę podstawowe metryki klasyfikacji (accuracy, precision, recall, f1) i zapisuję macierze pomyłek. 
+    Macro - liczy metryke osobno dla każdej klasy i robi średnią, a każda klasa ma taką samą wagę.
+    Average - klasa liczniejsza ma większy wpływ na wynik 
+    """
     charts_dir = Path("charts") / "confusion_matrixes"
     charts_dir.mkdir(parents=True, exist_ok=True)
 
@@ -43,7 +48,10 @@ def calculate_metrics(y_true, y_pred, model_name, split):
     }
 
 def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, text, model_name):
-    
+    """
+    Funkcja genereduje predykcje dla train i test, liczy ROC AUC jeśli model ma predict_proba albo decision_function
+    Tworzy wykres ROC, liczy metryki i zapisuje przykłady FP, FN i pie chart.
+    """
     y_train_pred = model.predict(X_train)
     y_test_pred = model.predict(X_test)
     y_test_proba = None
@@ -55,7 +63,7 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, text, mode
 
     if y_test_proba is not None: 
         roc_auc = roc_auc_score(y_test, y_test_proba)
-        plot_roc_curve(model, X_test, y_test, model_name)
+        plot_roc_curve(y_test, y_test_proba, model_name)
     else: 
         roc_auc = None
     
@@ -66,6 +74,9 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, text, mode
     return train_metrics, test_metrics, roc_auc
 
 def train_model(X_train, X_test, y_train, y_test, text):
+    """
+    Trenuje klasyfikatory, wykonuje ewaluację. 
+    """
     results = {}
     clf = {
         "Logistic Regression": LogisticRegression(random_state=42, solver="saga", class_weight="balanced", C=1.0, max_iter=3000), 

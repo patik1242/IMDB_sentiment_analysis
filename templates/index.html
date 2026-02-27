@@ -97,7 +97,7 @@ textarea {
 <form action="{{ url_for('index') }}" method="POST">
     <fieldset>
         <legend>Enter Review:</legend>
-        <textarea name="sentiment" required></textarea>
+        <textarea name="sentiment" required>{{ text|e }}</textarea>
         <br>
         <br>
         <input type="submit" class="btn" value = "Check sentiment">

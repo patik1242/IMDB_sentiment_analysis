@@ -1,7 +1,8 @@
-import app, pickle
+import pickle
+from flask import Flask, request, render_template
 from preprocessing import preprocess_vector
 
-app = app.Flask(__name__, template_folder='templates')
+app = Flask(__name__, template_folder='templates')
 vectorizer = None 
 
 with open("models/model.pkl", "rb") as f:
@@ -13,18 +14,17 @@ with open("models/vectorizer.pkl", "rb") as f:
 @app.route('/', methods=['GET', 'POST'])
 def index():
     sentiment = None
+    text = ""
+    if request.method =="POST":
+        text = request.form.get("sentiment", "")
 
-    if app.request.method =="POST":
-        text = app.request.form["sentiment"]
-        clean_text = preprocess_vector(text)
-        
-        X_vec = vectorizer.transform([clean_text])
+        if text.strip():
+            clean_text = preprocess_vector(text)
+            X_vec = vectorizer.transform([clean_text])
+            pred = model.predict(X_vec)
+            sentiment = "Positive" if pred[0]==1 else "Negative"
 
-        pred = model.predict(X_vec)
-
-        sentiment = "Positive" if pred[0]==1 else "Negative"
-
-    return app.render_template("index.html", sentiment=sentiment)
+    return render_template("index.html", sentiment=sentiment, text=text)
 
 if __name__ == "__main__":
     app.run(debug=True)

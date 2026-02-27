@@ -1,5 +1,5 @@
 from clean_data import load_clean_data
-from model_training import training_model
+from model import training_model
 
 def main():
     print("Ładuje dane....")
