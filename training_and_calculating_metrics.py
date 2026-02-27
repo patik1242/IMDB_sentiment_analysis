@@ -46,13 +46,19 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, text, mode
     
     y_train_pred = model.predict(X_train)
     y_test_pred = model.predict(X_test)
+    y_test_proba = None
+
     if hasattr(model, "predict_proba"):
         y_test_proba = model.predict_proba(X_test)[:,1]
+    elif hasattr(model, "decision_function"):
+        y_test_proba = model.decision_function(X_test)
+
+    if y_test_proba is not None: 
         roc_auc = roc_auc_score(y_test, y_test_proba)
         plot_roc_curve(model, X_test, y_test, model_name)
-    else:
-        roc_auc=None
-
+    else: 
+        roc_auc = None
+    
     train_metrics = calculate_metrics(y_train, y_train_pred, model_name, "train")
     test_metrics = calculate_metrics(y_test, y_test_pred, model_name, "test")
 
@@ -68,9 +74,14 @@ def train_model(X_train, X_test, y_train, y_test, text):
         }
     
     for model_name, classifier in clf.items():
+        print(f"[{model_name}] Trenuję model...")
         classifier.fit(X_train, y_train)
+        print(f"[{model_name}] Ewaluuję model...")
+
         train_metrics, test_metrics, roc_auc = train_and_evaluate_model(
             classifier, X_train, X_test, y_train, y_test, text, model_name)
+        print(f"[{model_name}] Tworzę learning curve...")
+
         plot_learning_curve(classifier, X_train, y_train, model_name)
         results[model_name] = {"params": classifier.get_params(), 
                                "estimator": classifier, 

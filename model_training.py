@@ -15,23 +15,26 @@ def training_model(clean_training):
     charts_dir = Path("charts")
     charts_dir.mkdir(exist_ok=True)
 
+    print("Przygotowuje dane do treningu... ")
     text = clean_training["review"].copy()
     y = clean_training["sentiment"]
 
     vectorizer = TfidfVectorizer(ngram_range = (1,2), max_df=0.9, max_features=120000, min_df=2)
 
+    print("Dzielę dane na train i test, wykonuję preprocessing + TF-IDF...")
     X_train, X_test, y_train, y_test = train_test_split(text, y, test_size=0.2, random_state=42, stratify=y) 
     
-    text = X_test
-
+    #Preprocessing
     X_train_preprocess = X_train.apply(preprocess_vector)
     X_test_preprocess = X_test.apply(preprocess_vector)   
 
+    #TF-IDF
     X_train_tfidf = vectorizer.fit_transform(X_train_preprocess)
     X_test_tfidf = vectorizer.transform(X_test_preprocess)
 
-    results = train_model(X_train_tfidf, X_test_tfidf, y_train, y_test, text)
-
+    print("Rozpoczynam trening modeli i obliczanie metryk...")
+    results = train_model(X_train_tfidf, X_test_tfidf, y_train, y_test, X_test)
+    
     best_estimator = None
 
     ALPHA = 0.5
@@ -72,11 +75,14 @@ def training_model(clean_training):
     if second_name is not None:
         y_pred_best = results[best_name]["estimator"].predict(X_test_tfidf)
         y_pred_second = results[second_name]["estimator"].predict(X_test_tfidf)
+        print("Porównuję dwa najlepsze modele testem McNemara...")
         mc_results = mcnemar_results(y_pred_best, y_pred_second, y_test)
     else:
         mc_results = None
     
+    print("Zapisuje wyniki w formacie json...")
     save_results_to_json(results, model_info, second_name, mc_results)
+    print("Zapisuje najlepszy model na podstawie F1 i gap...")
     save_model(best_estimator, vectorizer)
 
     plt.figure(figsize=(12,6))

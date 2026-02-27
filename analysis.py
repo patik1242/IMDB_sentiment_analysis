@@ -2,6 +2,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from scipy.stats import binom, chi2
 from sklearn.model_selection import learning_curve
@@ -44,22 +45,44 @@ def mcnemar_results(y_pred_a, y_pred_b, y_test):
     correct_a = (y_pred_a==y_test)
     correct_b = (y_pred_b==y_test)
 
-    b = int(np.sum((~correct_a) & correct_b))
-    c = int(np.sum(correct_a & (~correct_b)))
-    n = b+c
+    n01 = int(np.sum((~correct_a) & correct_b))
+    n10 = int(np.sum(correct_a & (~correct_b)))
+    n11 = int(np.sum((correct_a) & correct_b))
+    n00 = int(np.sum((~correct_a) & (~correct_b)))
+
+    n = n01 + n10
 
     if n==0:
-        return {"b": b, "c": c, "n": n, "method": "none", "p_value": 1.0}
+        return {"n01": n01, "n10": n10, "n": n, "n11": n11, "n00": n00, "method": "none", "p_value": 1.0}
     
-    n_min = min(b,c)
+    n_min = min(n01,n10)
     if n<25:
         pvalue = 2*binom.cdf(n_min, n, 0.5) 
         pvalue = min(1.0, pvalue)
-        return {"b": b, "c": c, "n": n,"method": "exact","p_value": float(min(1.0, pvalue))}
+        return {"n01": n01, "n10": n10, "n": n, "n11": n11, "n00": n00, "method": "exact","p_value": float(min(1.0, pvalue))}
 
-    chi2_statistic = (abs(b-c)-1)**2/n
+    chi2_statistic = (abs(n01-n10)-1)**2/n
     pvalue = chi2.sf(chi2_statistic,1)
-    return {"b": b, "c": c, "n": n, "method": "chi2", "chi2": float(chi2_statistic), "p_value": float(pvalue)}
+
+    matrix = np.array([
+        [n11, n10],
+        [n01, n00]], dtype=int)
+    
+    plt.figure(figsize=(6,6))
+    sns.heatmap(matrix, 
+                cmap = "Blues", 
+                annot = True, 
+                fmt = "d", 
+                xticklabels=["B correct", "B wrong"], 
+                yticklabels=["A correct", "A wrong"])
+    
+    plt.title(f"McNemar (p = {pvalue:.3g})")
+    plt.xlabel("Model B")
+    plt.ylabel("Model A")
+    plt.savefig(analysis_dir/f"McNemarResults.png")
+    plt.close()
+
+    return {"n01": n01, "n10": n10, "n": n, "n11": n11, "n00": n00, "method": "chi2", "chi2": float(chi2_statistic), "p_value": float(pvalue)}
 
 def plot_learning_curve(model,X,y, model_name):
     charts_dir = Path("charts") / "learning_curves"
