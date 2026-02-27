@@ -1,0 +1,128 @@
+{
+  "timestamp": "20260227_173435",
+  "model": {
+    "name": "Logistic Regression",
+    "f1_score": 0.9069803577411824
+  },
+  "all_models": {
+    "Logistic Regression": {
+      "params": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 3000,
+        "n_jobs": null,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "saga",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "train_metrics": {
+        "accuracy": 0.9490683543027155,
+        "precision": 0.9491358898377381,
+        "recall": 0.9490476555523404,
+        "f1": 0.9490641343189998
+      },
+      "test_metrics": {
+        "accuracy": 0.9070189592577652,
+        "precision": 0.907503398914995,
+        "recall": 0.9069542124995876,
+        "f1": 0.9069803577411824
+      },
+      "roc_auc": 0.9678346675330127
+    },
+    "LinearSVC": {
+      "params": {
+        "C": 0.25,
+        "class_weight": "balanced",
+        "dual": true,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "loss": "squared_hinge",
+        "max_iter": 30000,
+        "multi_class": "ovr",
+        "penalty": "l2",
+        "random_state": 42,
+        "tol": 0.0001,
+        "verbose": 0
+      },
+      "train_metrics": {
+        "accuracy": 0.9784927258515922,
+        "precision": 0.9785148153918972,
+        "recall": 0.9784826177648461,
+        "f1": 0.9784918575378675
+      },
+      "test_metrics": {
+        "accuracy": 0.9145824929407019,
+        "precision": 0.9149835335759964,
+        "recall": 0.9145244272672313,
+        "f1": 0.9145527510546522
+      },
+      "roc_auc": 0.9728329989952161
+    },
+    "Ridge Classifier": {
+      "params": {
+        "alpha": 2.0,
+        "class_weight": "balanced",
+        "copy_X": true,
+        "fit_intercept": true,
+        "max_iter": null,
+        "positive": false,
+        "random_state": 42,
+        "solver": "lsqr",
+        "tol": 0.0001
+      },
+      "train_metrics": {
+        "accuracy": 0.9822747787499054,
+        "precision": 0.9823000085948121,
+        "recall": 0.9822639749910773,
+        "f1": 0.9822740169696627
+      },
+      "test_metrics": {
+        "accuracy": 0.9157926583299718,
+        "precision": 0.9163676039634039,
+        "recall": 0.915723016298134,
+        "f1": 0.9157530525967978
+      },
+      "roc_auc": 0.9733682410235087
+    },
+    "MultinomialNB": {
+      "params": {
+        "alpha": 0.5,
+        "class_prior": null,
+        "fit_prior": true,
+        "force_alpha": true
+      },
+      "train_metrics": {
+        "accuracy": 0.9272080885504652,
+        "precision": 0.9272067314869705,
+        "recall": 0.9272122285060105,
+        "f1": 0.9272076968683017
+      },
+      "test_metrics": {
+        "accuracy": 0.8897741024606697,
+        "precision": 0.8898629121324064,
+        "recall": 0.8897458171935915,
+        "f1": 0.8897612664894599
+      },
+      "roc_auc": 0.9566058536203161
+    }
+  },
+  "mcnemar": {
+    "model_a": "Logistic Regression",
+    "model_b": "LinearSVC",
+    "n01": 147,
+    "n10": 72,
+    "n": 219,
+    "n11": 8922,
+    "n00": 775,
+    "method": "chi2",
+    "chi2": 25.004566210045663,
+    "p_value": 5.719470196854209e-07
+  }
+}

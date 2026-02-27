@@ -2,6 +2,7 @@ from analysis import false_sentences, plot_learning_curve, plot_roc_curve
 
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
 
 from pathlib import Path
@@ -81,7 +82,8 @@ def train_model(X_train, X_test, y_train, y_test, text):
     clf = {
         "Logistic Regression": LogisticRegression(random_state=42, solver="saga", class_weight="balanced", C=1.0, max_iter=3000), 
         "LinearSVC": LinearSVC(C=0.25, dual=True, loss="squared_hinge", random_state=42, class_weight="balanced", max_iter=30000), 
-        "Ridge Classifier": RidgeClassifier(alpha=2.0, solver="lsqr", class_weight= "balanced", random_state=42)
+        "Ridge Classifier": RidgeClassifier(alpha=2.0, solver="lsqr", class_weight= "balanced", random_state=42),
+        "MultinomialNB": MultinomialNB(alpha=0.5)
         }
     
     for model_name, classifier in clf.items():

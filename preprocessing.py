@@ -15,12 +15,17 @@ def ensure_nltk():
 def preprocess_base(text):
     if not isinstance(text, str):
         return ""
-    
+
+    #usuwam elementy charakterystyczne dla html
+    text = re.sub(r"(?is)<(script|style).*?>.*?</\1>", " ", text)
+    text = re.sub(r"(?s)<[^>]+>", " ", text)
+
+    text = re.sub(r"([!?.;,])\1+", r"\1", text)
     #oddzielam znaki interpunkcji spacja + znak + spacja
     text = re.sub(r"([!?.;,])", r" \1 ", text)
 
     #Usuwam wszystko oprócz tego co jest podane w []
-    text = re.sub(r"[^a-zA-Z0-9!?'.,; ]+", "", text)
+    text = re.sub(r"[^a-zA-Z0-9!?'.,; ]+", " ", text)
 
     #Zamieniam więcej spacji na jedną
     text = re.sub(r"\s+", " ", text)
