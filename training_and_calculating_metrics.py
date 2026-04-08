@@ -67,11 +67,12 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test, text, mode
         plot_roc_curve(y_test, y_test_proba, model_name)
     else: 
         roc_auc = None
-    
+
     train_metrics = calculate_metrics(y_train, y_train_pred, model_name, "train")
     test_metrics = calculate_metrics(y_test, y_test_pred, model_name, "test")
 
     false_sentences(text, y_test_pred, y_test, name = f"{model_name}")
+        
     return train_metrics, test_metrics, roc_auc
 
 def train_model(X_train, X_test, y_train, y_test, text):
@@ -93,9 +94,10 @@ def train_model(X_train, X_test, y_train, y_test, text):
 
         train_metrics, test_metrics, roc_auc = train_and_evaluate_model(
             classifier, X_train, X_test, y_train, y_test, text, model_name)
+        
         print(f"[{model_name}] Tworzę learning curve...")
-
         plot_learning_curve(classifier, X_train, y_train, model_name)
+        
         results[model_name] = {"params": classifier.get_params(), 
                                "estimator": classifier, 
                                "train": train_metrics, 

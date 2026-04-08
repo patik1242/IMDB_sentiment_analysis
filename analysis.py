@@ -151,4 +151,3 @@ def plot_roc_curve(y_true, y_score, model_name):
     plt.grid()
     plt.savefig(charts_dir/f"ROC_{model_name}.png")
     plt.close()
-
