@@ -99,6 +99,7 @@ A simple Flask app allows real-time predictions:
 **Output:** sentiment (Positive / Negative)
 
 ## 📂 Project Structure
+```bash
 project/
 │
 ├── data/                  # dataset
@@ -116,11 +117,12 @@ project/
 ├── app.py
 ├── save_to_json.py
 ├── requirements.txt
+```
 
 ## 🚀 How to Run
-1. python -m venv .venv
-   .venv\Scripts\activate
-   pip install -r requirements.txt
+1. - python -m venv .venv
+   - .venv\Scripts\activate
+   - pip install -r requirements.txt
 3. Train model - python main.py
 4. Run web app - python app.py
 
